@@ -1,0 +1,47 @@
+{
+    "es_instance_name" : "{{inventory_hostname}}",
+    "masterHosts_transport" : "{% for host in groups['es-master-nodes'] %} {{hostvars[host]['ansible_'+public_iface]['ipv4']['address'] }}{%endfor %}",
+    "es_config": {
+      "node.name" : "{{es_instance_name}}",
+      "node.master": true,
+      "node.data": false,
+      "network.host": ["{{ hostvars[inventory_hostname]['ansible_' + public_iface]['ipv4']['address'] }}","_local_" ],
+      "discovery.zen.ping.unicast.hosts" : "{{ masterHosts_transport.split() }}",
+
+      "cluster.name": "searchguard-ansible",
+    "searchguard": {
+      "enterprise_modules_enabled": true,
+      "restapi": {
+        "roles_enabled": [
+          "sg_all_access"
+        ]
+      },
+      "authcz": {
+        "admin_dn": [
+          "CN=kirk,OU=client,O=client,L=test,C=de"
+        ]
+      },
+      "allow_unsafe_democertificates": true,
+      "allow_default_init_sgindex": false,
+      "enable_snapshot_restore_privilege": true,
+      "check_snapshot_restore_write_privileges": true,
+      "audit": {
+        "type": "internal_elasticsearch"
+      },
+      "ssl": {
+        "http": {
+          "enabled": true,
+          "pemkey_filepath": "certificates/node_cert_key.pem",
+          "pemcert_filepath": "certificates/node_cert.pem",
+          "pemtrustedcas_filepath": "certificates/ca_cert.pem"
+        },
+        "transport": {
+          "enforce_hostname_verification": false,
+          "pemkey_filepath": "certificates/node_cert_key.pem",
+          "pemcert_filepath": "certificates/node_cert.pem",
+          "pemtrustedcas_filepath": "certificates/ca_cert.pem"
+        }
+      }
+    }
+    }
+  }

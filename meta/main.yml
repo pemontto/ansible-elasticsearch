@@ -1,11 +1,13 @@
 ---
 
+#Originally developed by elastic
+#https://github.com/elastic/ansible-elasticsearch
 allow_duplicates: yes
 
 galaxy_info:
-  author: Robin Clarke, Jakob Reiter, Dale McDiarmid
-  description: Elasticsearch for Linux
-  company: "Elastic.co"
+  author: "Hendrik Saly (original authors: Robin Clarke, Jakob Reiter, Dale McDiarmid)"
+  description: Search Guard secured Elasticsearch
+  company: "floragunn GmbH"
   license: "license (Apache)"
   min_ansible_version: 2.3.2
   platforms:

@@ -1,0 +1,8 @@
+public_iface: eth1   # For Vagrant Provider
+es_version: 6.5.1
+es_major_version: 6.x
+es_enable_xpack: false
+es_java_install: true
+es_plugins:
+  - search-guard-6: com.floragunn:search-guard-6:6.5.1-24.0
+  - ingest-geoip: ingest-geoip

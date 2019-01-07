@@ -1,0 +1,42 @@
+- hosts: es-master-nodes
+  become: true
+  roles:
+    - { role: search-guard-ansible }
+  pre_tasks:
+    - name: Copy certificates
+      copy:
+        src: "{{ playbook_dir }}/files/certificates"
+        dest: "/etc/elasticsearch/{{ inventory_hostname }}"
+ 
+- hosts: es-data-nodes
+  become: true
+  roles:
+    - { role: search-guard-ansible }
+  handlers:
+    - name: execute sgadmin
+      shell: "chmod +x /usr/share/elasticsearch/plugins/search-guard-6/tools/sgadmin.sh; /usr/share/elasticsearch/plugins/search-guard-6/tools/sgadmin.sh -icl -h localhost -cd /etc/elasticsearch/sgconfig/ -key /etc/elasticsearch/{{ inventory_hostname }}/certificates/admin_cert_key.pem -cert /etc/elasticsearch/{{ inventory_hostname }}/certificates/admin_cert.pem -cacert /etc/elasticsearch/{{ inventory_hostname }}/certificates/ca_cert.pem -nhnv"
+      retries: 3
+      delay: 5
+      register: result
+      until: result.rc == 0
+  pre_tasks:
+    - name: Copy certificates
+      copy:
+        src: "{{ playbook_dir }}/files/certificates"
+        dest: "/etc/elasticsearch/{{ inventory_hostname }}"
+  post_tasks:
+    - name: Copy sg config
+      copy:
+        src: "{{ playbook_dir }}/files/sgconfig"
+        dest: "/etc/elasticsearch"
+      notify: execute sgadmin
+
+- hosts: es-data-nodes
+  become: true
+  tasks:
+    - name: Check health sga
+      shell: "chmod +x /usr/share/elasticsearch/plugins/search-guard-6/tools/sgadmin.sh;/usr/share/elasticsearch/plugins/search-guard-6/tools/sgadmin.sh -icl -h localhost -si -key /etc/elasticsearch/{{ inventory_hostname }}/certificates/admin_cert_key.pem -cert /etc/elasticsearch/{{ inventory_hostname }}/certificates/admin_cert.pem -cacert /etc/elasticsearch/{{ inventory_hostname }}/certificates/ca_cert.pem -nhnv"
+      changed_when: False
+    - name: Check health curl
+      shell: "curl -Ssk https://localhost:9200 -u admin:admin --fail"
+      changed_when: False
