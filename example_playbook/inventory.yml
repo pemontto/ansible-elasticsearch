@@ -1,21 +1,57 @@
-es-master-nodes:
+# Example inventories
+
+# 3 nodes: every node is a data node and also master eligible
+es-nodes: # must be named 'es-nodes'
   hosts:
-    es-master-1:                    # hostname
-      ansible_host: 192.168.33.25   # ip address
+    es-node-1:                    # must be the full qualified hostname
+      es_master_node: true
+      es_data_node: true
+      es_ingest_node: true
+      es_heap_size: 1g
+      ansible_host: 192.168.33.25 # ip address
       ansible_user: vagrant
-      memory: 3072                # ram to be assigned in MB
-      ansible_ssh_private_key_file: .vagrant/machines/es-master-1/virtualbox/private_key
- 
-es-data-nodes:
-  hosts:
-    es-data-1:
+      ansible_ssh_private_key_file: .vagrant/machines/es-node-1/virtualbox/private_key
+    es-node-2:
+      es_master_node: true
+      es_data_node: true
+      es_ingest_node: true
+      es_heap_size: 1g
       ansible_host: 192.168.33.26
       ansible_user: vagrant
-      memory: 3072
-      ansible_ssh_private_key_file: .vagrant/machines/es-data-1/virtualbox/private_key
- 
-    es-data-2:
+      ansible_ssh_private_key_file: .vagrant/machines/es-node-2/virtualbox/private_key
+    es-node-3:
+      es_master_node: true
+      es_data_node: true
+      es_ingest_node: true
+      es_heap_size: 1g
       ansible_host: 192.168.33.27
       ansible_user: vagrant
-      memory: 3072
-      ansible_ssh_private_key_file: .vagrant/machines/es-data-2/virtualbox/private_key
+      ansible_ssh_private_key_file: .vagrant/machines/es-node-3/virtualbox/private_key
+
+# 3 nodes: one master eligible, one data node, one client node
+#es-nodes: # must be named 'es-nodes'
+#  hosts:
+#    es-node-1:                    # must be the full qualified hostname
+#      es_master_node: true
+#      es_data_node: false
+#      es_ingest_node: false
+#      es_heap_size: 1g
+#      ansible_host: 192.168.33.25 # ip address
+#      ansible_user: vagrant
+#      ansible_ssh_private_key_file: .vagrant/machines/es-node-1/virtualbox/private_key
+#    es-node-2:
+#      es_master_node: false
+#      es_data_node: true
+#      es_ingest_node: false
+#      es_heap_size: 1g
+#      ansible_host: 192.168.33.26
+#      ansible_user: vagrant
+#      ansible_ssh_private_key_file: .vagrant/machines/es-node-2/virtualbox/private_key
+#    es-node-3:
+#      es_master_node: false
+#      es_data_node: false
+#      es_ingest_node: true
+#      es_heap_size: 1g
+#      ansible_host: 192.168.33.27
+#      ansible_user: vagrant
+#      ansible_ssh_private_key_file: .vagrant/machines/es-node-3/virtualbox/private_key

@@ -1,8 +1,80 @@
 public_iface: eth1   # For Vagrant Provider
-es_version: 6.5.1
+
+#IP based master eligible nodes from the inventory
+#master_eligible_nodes: "{% for host in groups['es-nodes'] %} {% if hostvars[host]['es_master_node'] == true %} {{hostvars[host]['ansible_'+public_iface]['ipv4']['address']}}{% endif %}{%endfor %}"
+
+#Hostname based master eligible nodes from the inventory
+master_eligible_nodes: "{% for host in groups['es-nodes'] %} {% if hostvars[host]['es_master_node'] == true %}{{hostvars[host]['inventory_hostname']}}{% endif %}{%endfor %}"
+
+#(!) Change this to your needs
+clustername: searchguard-ansible
+
+#(!) Change this to your needs
+es_version: 6.6.0
 es_major_version: 6.x
+sg_version: 24.1
+
+es_heap_size: "{{ hostvars[inventory_hostname]['es_heap_size'] }}"
+
+es_scripts: false
+es_templates: false
+es_version_lock: false
+
 es_enable_xpack: false
 es_java_install: true
 es_plugins:
-  - search-guard-6: com.floragunn:search-guard-6:6.5.1-24.0
+  - search-guard-6: "com.floragunn:search-guard-6:{{ es_version }}-{{ sg_version }}" #do not remove this line
   - ingest-geoip: ingest-geoip
+es_data_dirs: "/opt/elasticsearch"
+es_instance_name: "{{ inventory_hostname }}"
+es_api_host: "{{ inventory_hostname }}"
+es_api_port: 9200
+
+### Below lines will be converted to elasticsearch.yml
+es_config:
+  cluster.name: "{{ clustername }}"
+  node.name: "{{ es_instance_name }}"
+  node.master: "{{ hostvars[inventory_hostname]['es_master_node'] }}"
+  node.data: "{{ hostvars[inventory_hostname]['es_data_node'] }}"
+  node.ingest: "{{ hostvars[inventory_hostname]['es_ingest_node'] }}"
+  network.host:
+  - "{{ inventory_hostname }}"
+  #- "{{ hostvars[inventory_hostname]['ansible_' + public_iface]['ipv4']['address']}}" #listen also on ip address
+  #- _local_ # listen also on localhost
+  discovery.zen.ping.unicast.hosts: "{{ master_eligible_nodes.split() }}"
+  #(master_eligible_nodes / 2) + 1
+  discovery.zen.minimum_master_nodes: "{{ (((master_eligible_nodes.split() | length | int ) / 2) | round(0,'floor') | int) + 1 }}"
+  http.port: 9200
+  transport.tcp.port: 9300
+
+  # Add other elasticsearch.yml properties if needed
+  #bootstrap.memory_lock: true
+  #node.rack: ${RACK_ENV_VAR}
+  #...
+
+  #(!) Change this to your needs
+  searchguard:
+    enterprise_modules_enabled: true
+    restapi:
+      roles_enabled:
+      - sg_all_access
+    authcz:
+      admin_dn:
+      - CN=kirk,OU=client,O=client,L=test,C=de
+    allow_unsafe_democertificates: true
+    allow_default_init_sgindex: false
+    enable_snapshot_restore_privilege: true
+    check_snapshot_restore_write_privileges: true
+    audit:
+      type: internal_elasticsearch
+    ssl:
+      http:
+        enabled: true
+        pemkey_filepath: certificates/node_cert_key.pem
+        pemcert_filepath: certificates/node_cert.pem
+        pemtrustedcas_filepath: certificates/ca_cert.pem
+      transport:
+        enforce_hostname_verification: false
+        pemkey_filepath: certificates/node_cert_key.pem
+        pemcert_filepath: certificates/node_cert.pem
+        pemtrustedcas_filepath: certificates/ca_cert.pem

@@ -83,7 +83,7 @@ searchguard:
       kerberos_auth_domain: 
         http_enabled: false
         transport_enabled: false
-        order: 6
+        order: 5
         http_authenticator:
           type: kerberos # NOT FREE FOR COMMERCIAL USE
           challenge: true

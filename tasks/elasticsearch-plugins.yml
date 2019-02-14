@@ -85,3 +85,12 @@
 - name: Set Plugin Directory Permissions
   become: yes
   file: state=directory path={{ es_home }}/plugins owner={{ es_user }} group={{ es_group }} recurse=yes
+
+- name: Make sgadmin.sh executable
+  file:
+    path: /usr/share/elasticsearch/plugins/search-guard-6/tools/sgadmin.sh
+    mode: 0755
+- name: Make hash.sh executable
+  file:
+    path: /usr/share/elasticsearch/plugins/search-guard-6/tools/hash.sh
+    mode: 0755

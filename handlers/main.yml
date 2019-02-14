@@ -12,3 +12,10 @@
     - es_restart_on_change
     - es_start_service
   register: es_restarted
+
+- name: execute sgadmin
+  shell: "/usr/share/elasticsearch/plugins/search-guard-6/tools/sgadmin.sh -nhnv -cn {{ clustername }} -h {{ inventory_hostname }} -cd /etc/elasticsearch/sgconfig/ -key /etc/elasticsearch/{{ inventory_hostname }}/certificates/admin_cert_key.pem -cert /etc/elasticsearch/{{ inventory_hostname }}/certificates/admin_cert.pem -cacert /etc/elasticsearch/{{ inventory_hostname }}/certificates/ca_cert.pem"
+  retries: 3
+  delay: 5
+  register: result
+  until: result.rc == 0

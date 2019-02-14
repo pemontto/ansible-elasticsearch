@@ -3,6 +3,7 @@ require 'yaml'
  
 DEFAULT_BASE_BOX = "bento/ubuntu-16.04"
 cpuCap = 30                                   # Limit to 30% of the cpu
+ram = 2048
 inventory = YAML.load_file("inventory.yml")   # Get the names & ip addresses for the guest hosts
 VAGRANTFILE_API_VERSION = '2'
 
@@ -40,7 +41,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         node.vm.box = hostInfo['box'] ||= DEFAULT_BASE_BOX
         node.vm.hostname = hostName                                       # Set the hostname
         node.vm.network :private_network, ip: hostInfo['ansible_host']    # Set the IP address
-        ram = hostInfo['memory']                                          # Set the memory
+        #ram = hostInfo['memory']                                          # Set the memory
         node.vm.provider :virtualbox do |vb|
           vb.name = hostName
           vb.customize ["modifyvm", :id, "--cpuexecutioncap", cpuCap, "--memory", ram.to_s]
