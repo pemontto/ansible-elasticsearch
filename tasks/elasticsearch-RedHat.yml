@@ -42,7 +42,9 @@
     state: present
     update_cache: yes
     allow_downgrade: '{{ allow_downgrade }}'
-  when: es_use_repository
+  when:
+    - es_use_repository
+    - not es_enable_opendistro
   register: redhat_elasticsearch_install_from_repo
   notify: restart elasticsearch
   until: redhat_elasticsearch_install_from_repo.rc == 0
@@ -51,9 +53,40 @@
   environment:
     ES_PATH_CONF: "/etc/elasticsearch"
 
+- name: RedHat - Install opendistroforelasticsearch
+  become: yes
+  yum:
+    name: '{{ es_package_name }}{% if opendistro_version is defined and opendistro_version != ""  %}-{{ opendistro_version }}{% endif %}'
+    state: present
+    update_cache: yes
+    allow_downgrade: '{{ allow_downgrade }}'
+  when:
+    - es_use_repository
+    - es_enable_opendistro
+  register: redhat_opendistroforelasticsearch_install_from_repo
+  notify: restart elasticsearch
+  # until: redhat_opendistroforelasticsearch_install_from_repo.rc == 0
+  retries: 5
+  delay: 10
+  environment:
+    ES_PATH_CONF: "/etc/elasticsearch"
+
+- debug: var=redhat_opendistroforelasticsearch_install_from_repo
+
 - name: RedHat - Install Elasticsearch from url
   become: yes
   yum: name={% if es_custom_package_url is defined %}{{ es_custom_package_url }}{% else %}{{ es_package_url }}-{{ es_version }}.noarch.rpm{% endif %} state=present
-  when: not es_use_repository
+  when:
+    - not es_use_repository
+    - not es_enable_opendistro
   register: elasticsearch_install_from_package
+  notify: restart elasticsearch
+
+- name: RedHat - Install opendistroforelasticsearch from url
+  become: yes
+  yum: name={% if es_custom_package_url is defined %}{{ es_custom_package_url }}{% else %}{{ es_package_url }}-{{ opendistro_version }}.noarch.rpm{% endif %} state=present
+  when:
+    - not es_use_repository
+    - not es_enable_opendistro
+  register: opendistroforelasticsearch_install_from_package
   notify: restart elasticsearch

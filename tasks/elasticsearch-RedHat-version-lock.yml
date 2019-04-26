@@ -4,4 +4,9 @@
   yum: name=yum-plugin-versionlock state=present update_cache=yes
 - name: RedHat - lock elasticsearch version
   become: yes
-  shell: yum versionlock delete 0:elasticsearch* ; yum versionlock add {{ es_package_name }}{% if es_version is defined and es_version != "" %}-{{ es_version }}{% endif %}
+  shell: yum versionlock delete 0:{{ es_package_name }}* ; yum versionlock add {{ es_package_name }}{% if es_version is defined and es_version != "" %}-{{ es_version }}{% endif %}
+  when: not es_enable_opendistro
+- name: RedHat - lock elasticsearch version
+  become: yes
+  shell: yum versionlock delete 0:{{ es_package_name }}* ; yum versionlock add {{ es_package_name }}{% if opendistro_version is defined and opendistro_version != "" %}-{{ opendistro_version }}{% endif %}
+  when: not es_enable_opendistro

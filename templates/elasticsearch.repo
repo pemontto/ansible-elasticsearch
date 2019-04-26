@@ -9,3 +9,18 @@ type=rpm-md
 {% if es_proxy_host is defined and es_proxy_host != '' and es_proxy_port is defined %}
 proxy=http://{{ es_proxy_host }}:{{es_proxy_port}}
 {% endif %}
+
+{% if es_enable_opendistro is defined and es_enable_opendistro %}
+[opendistroforelasticsearch-artifacts-repo]
+name=Release RPM artifacts of OpenDistroForElasticsearch
+baseurl={{ es_opendistro_repo_base }}/yum/noarch/
+enabled=1
+gpgkey={{ es_opendistro_repo_base }}/GPG-KEY-opendistroforelasticsearch
+gpgcheck=1
+repo_gpgcheck=1
+autorefresh=1
+type=rpm-md
+{% if es_proxy_host is defined and es_proxy_host != '' and es_proxy_port is defined %}
+proxy=http://{{ es_proxy_host }}:{{es_proxy_port}}
+{% endif %}
+{% endif %}

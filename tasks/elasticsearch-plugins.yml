@@ -85,3 +85,13 @@
 - name: Set Plugin Directory Permissions
   become: yes
   file: state=directory path={{ es_home }}/plugins owner={{ es_user }} group={{ es_group }} recurse=yes
+
+- name: Make securityadmin.sh executable
+  file:
+    path: "{{es_home}}/plugins/opendistro_security/tools/securityadmin.sh"
+    mode: 0755
+
+- name: Make hash.sh executable
+  file:
+    path: "{{es_home}}/plugins/opendistro_security/tools/hash.sh"
+    mode: 0755

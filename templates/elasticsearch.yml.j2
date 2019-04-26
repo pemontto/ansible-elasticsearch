@@ -73,3 +73,16 @@ xpack.notification.email:
         password: {{ es_mail_config['pass'] }}
         {% endif %}  
 {% endif %}
+
+{% if es_enable_opendistro %}
+######## Start OpenDistro for Elasticsearch Security Configuration ########
+cluster.routing.allocation.disk.threshold_enabled: false
+{% if es_opendistro_security %}
+{% if opendistro_config %}
+{{ opendistro_config | to_nice_yaml }}
+{% endif %}
+{% else %}
+opendistro_security.disabled: true
+{% endif %}
+######## End OpenDistro for Elasticsearch Security Demo Configuration ########
+{% endif %}
