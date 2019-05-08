@@ -1,8 +1,12 @@
 # Check for mandatory parameters
 
-- name: fail when es version below opendistro minimum
-  fail: msg="es_version is lower than 6.5.4, can't support opendistro"
-  when: es_enable_opendistro and es_version | version_compare('6.5.4', '<')
+- name: fail when ES version not comaptible with OpenDistro
+  fail:
+    msg:
+     - "Couldn't find OpenDistro version compatible with es_version {{ es_version }}. Compatible vesrsions: {{ es_opendistro_version_mapping | list | join(', ') }}"
+     - "See https://opendistro.github.io/for-elasticsearch-docs/#version-history for more information"
+  when:
+    - es_enable_opendistro and not opendistro_version
 
 - debug:
     msg:
@@ -10,12 +14,13 @@
       - "es_enable_opendistro: {{es_enable_opendistro}}"
       - "es_opendistro_security: {{es_opendistro_security}}"
       - "opendistro_config: {{opendistro_config}}"
+      - "opendistro_version: {{ opendistro_version}}"
 
-- name: fail when both xpack security and opendistro are enabled 
+- name: fail when both xpack security and opendistro are enabled
   fail: msg="both xpack and opendistro enabled"
   when: es_enable_opendistro and es_enable_xpack
 
-- name: fail when install opendistro on debian 
+- name: fail when install opendistro on debian
   fail: msg="opendistro cannot be installed on debian"
   when: es_enable_opendistro and ansible_os_family == 'Debian'
 

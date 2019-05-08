@@ -2,6 +2,10 @@
 es_enable_opendistro: false
 es_opendistro_security: false
 es_opendistro_repo_base: "https://d3g5vo6xdbdb9a.cloudfront.net"
+es_opendistro_version_mapping:
+    6.5.4: 0.7.1
+    6.6.2: 0.8.0
+    6.7.1: 0.9.0
 
 es_major_version: "6.x"
 es_version: "6.6.0"

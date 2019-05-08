@@ -29,7 +29,7 @@
     es_install_xpack: true
     es_xpack_users_command: "x-pack/users"
     es_xpack_conf_subdir: "/x-pack"
-  when: 
+  when:
     - not es_open_xpack
     - es_enable_xpack
     - not es_enable_opendistro
@@ -51,5 +51,11 @@
     es_other_repo_name: "{{ es_major_version }}"
     es_package_name: "opendistroforelasticsearch"
     es_other_package_name: "elasticsearch"
+  when:
+    - es_enable_opendistro
+
+- name: Elasticsearch to OpenDistro version
+  set_fact:
+    opendistro_version: "{{ es_opendistro_version_mapping[es_version] | default(False) }}"
   when:
     - es_enable_opendistro
